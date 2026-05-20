@@ -70,7 +70,8 @@ app.get("/login", (req, res) => {
         `?client_id=${client_id}` +
         `&redirect_uri=${redirect_uri}` +
         `&response_type=code` +
-        `&scope=${scope}`;
+        `&scope=${scope}`+
+        `&force_verify=true`;
 
     res.send(`
         <html>
