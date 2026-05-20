@@ -68,25 +68,28 @@ app.get("/login", (req, res) => {
     const authUrl =
         `https://id.twitch.tv/oauth2/authorize` +
         `?client_id=${client_id}` +
-        `&redirect_uri=${redirect_uri}` +
+        `&redirect_uri=${encodeURIComponent(redirect_uri)}` +
         `&response_type=code` +
-        `&scope=${scope}`+
+        `&scope=${encodeURIComponent(scope)}` +
         `&force_verify=true`;
 
-    res.send(`
-        <html>
-        <head>
-            <title>Login Twitch</title>
-        </head>
-        <body>
-            <h1>Login con Twitch</h1>
-            <a href="${authUrl}">
-                <button>Iniciar sesión</button>
-            </a>
-        </body>
-        </html>
-    `);
+        res.send(authUrl);
+
+    // res.send(`
+    //     <html>
+    //     <head>
+    //         <title>Login Twitch</title>
+    //     </head>
+    //     <body>
+    //         <h1>Login con Twitch</h1>
+    //         <a href="${authUrl}">
+    //             <button>Iniciar sesión</button>
+    //         </a>
+    //     </body>
+    //     </html>
+    // `);
 });
+
 
 
 app.get("/callback", async (req, res) => {
@@ -102,34 +105,70 @@ app.get("/callback", async (req, res) => {
                 client_secret: process.env.CLIENT_SECRET,
                 code: code,
                 grant_type: "authorization_code",
-                redirect_uri: "https://twitchappbackend-1.onrender.com/callback"
-            })
+                redirect_uri: redirect_uri
+            }),
+            {
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded"
+                }
+            }
         );
 
         const accessToken = tokenResponse.data.access_token;
 
+        console.log("ACCESS TOKEN:");
+        console.log(accessToken);
+
+        const userResponse = await axios.get(
+            "https://api.twitch.tv/helix/users",
+            {
+                headers: {
+                    "Client-Id": CLIENT_ID,
+                    "Authorization": `Bearer ${accessToken}`
+                }
+            }
+        );
+
+
+
+
         
-res.send(`
-<html>
-<head>
-    <title>Login completado</title>
-</head>
-<body>
-    <h1>✅ Login Twitch correcto</h1>
-    <p>Pulsa para volver a la app</p>
+console.log("USER:");
+        console.log(userResponse.data);
 
-    <a href="pruebasapp://auth?token=${accessToken}">
-        <button>Volver a la app</button>
-    </a>
+        // REDIRECT A APP ANDROID
+        res.send(`
+        <html>
 
-    <script>
-        // intento automático
-        window.location.href = "pruebasapp://auth?token=${accessToken}";
-    </script>
-</body>
-</html>
-`);
+        <head>
+            <title>Login Twitch</title>
+        </head>
 
+        <body style="
+            background:#0B0B12;
+            color:white;
+            font-family:sans-serif;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+            flex-direction:column;
+        ">
+
+            <h1>✅ Login correcto</h1>
+
+            <p>Redirigiendo a la app...</p>
+
+            <script>
+                window.location.href =
+                    "pruebasapp://auth?token=${accessToken}";
+            </script>
+
+        </body>
+
+        </html>
+        `);
  
 
     } catch (err) {
