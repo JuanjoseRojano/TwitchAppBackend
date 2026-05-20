@@ -68,9 +68,9 @@ app.get("/login", (req, res) => {
     const authUrl =
         `https://id.twitch.tv/oauth2/authorize` +
         `?client_id=${client_id}` +
-        `&redirect_uri=${encodeURIComponent(redirect_uri)}` +
-        `&response_type=code` +
-        `&scope=${encodeURIComponent(scope)}`;
+        `redirect_uri=${encodeURIComponent(redirect_uri)}` +
+        `response_type=code` +
+        `scope=${encodeURIComponent(scope)}`;
 
     res.send(`
         <html>
