@@ -17,6 +17,7 @@ const redirect_uri = "https://twitchappbackend-1.onrender.com/callback";
 
 app.get("/", async (req, res) => {
 
+    console.log("Entra en /");
     try {
 
         const tokenResponse = await axios.post(
@@ -61,6 +62,8 @@ app.get("/", async (req, res) => {
 app.get("/login", (req, res) => {
     const client_id = process.env.CLIENT_ID;
     const scope = "user:read:email";
+        console.log("Entra en /login");
+
 
     const authUrl =
         `https://id.twitch.tv/oauth2/authorize` +
@@ -69,10 +72,25 @@ app.get("/login", (req, res) => {
         `&response_type=code` +
         `&scope=${encodeURIComponent(scope)}`;
 
-    res.redirect(authUrl);
+    res.send(`
+        <html>
+        <head>
+            <title>Login Twitch</title>
+        </head>
+        <body>
+            <h1>Login con Twitch</h1>
+            <a href="${authUrl}">
+                <button>Iniciar sesión</button>
+            </a>
+        </body>
+        </html>
+    `);
 });
 
+
 app.get("/callback", async (req, res) => {
+        console.log("Entra en /callback");
+
     const code = req.query.code;
 
     try {
