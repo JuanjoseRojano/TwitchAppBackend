@@ -6,9 +6,12 @@ const axios = require("axios");
 const app = express();
 
 
+
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const PORT = process.env.PORT || 3000;
+const redirect_uri = "https://twitchappbackend-1.onrender.com/callback";
+
 // const scope = "user:read:email";
 
 
@@ -57,7 +60,6 @@ app.get("/", async (req, res) => {
 
 app.get("/login", (req, res) => {
     const client_id = process.env.CLIENT_ID;
-    const redirect_uri = "https://twitchappbackend-1.onrender.com/callback";
     const scope = "user:read:email";
 
     const authUrl =
@@ -87,9 +89,28 @@ app.get("/callback", async (req, res) => {
 
         const accessToken = tokenResponse.data.access_token;
 
-        const url = `intent://auth?token=${accessToken}#Intent;scheme=pruebasapp;package=com.example.pruebasdeproyecto;end`;
+        
+res.send(`
+<html>
+<head>
+    <title>Login completado</title>
+</head>
+<body>
+    <h1>✅ Login Twitch correcto</h1>
+    <p>Pulsa para volver a la app</p>
 
-        res.send(url);
+    <a href="pruebasapp://auth?token=${accessToken}">
+        <button>Volver a la app</button>
+    </a>
+
+    <script>
+        // intento automático
+        window.location.href = "pruebasapp://auth?token=${accessToken}";
+    </script>
+</body>
+</html>
+`);
+
  
 
     } catch (err) {
