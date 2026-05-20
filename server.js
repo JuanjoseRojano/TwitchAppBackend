@@ -87,7 +87,10 @@ app.get("/callback", async (req, res) => {
 
         const accessToken = tokenResponse.data.access_token;
 
-        res.redirect("pruebasapp://auth?token=" + accessToken);
+        const url = `intent://auth?token=${accessToken}#Intent;scheme=pruebasapp;package=com.example.pruebasdeproyecto;end`;
+
+        res.send(url);
+ 
 
     } catch (err) {
         console.error(err.response?.data || err.message);
